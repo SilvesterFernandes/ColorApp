@@ -8,7 +8,7 @@
 <h2>Project Setup</h2>
 <ol>
     <li><strong>Clone the repository:</strong>
-        <pre><code>git clone https://github.com/yourusername/colorapp.git</code></pre>
+        <pre><code>git clone https://github.com/SilvesterFernandes/colorapp.git</code></pre>
     </li>
     <li><strong>Open the project in Android Studio:</strong>
         <ul>
