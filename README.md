@@ -6,7 +6,7 @@
 </p>
 
 <h2>Screenshots</h2>
-![App Screen](screenshots/App_Screen.png)
+![App Screen](file:///I:/Github/ColorApp/screenshots/App_Screen.png)
 
 <h2>Project Setup</h2>
 <ol>
