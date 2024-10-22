@@ -1,3 +1,4 @@
+# Ignore IntelliJ IDEA and Android Studio files
 *.iml
 .gradle
 /local.properties
@@ -7,9 +8,18 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+
+# Ignore macOS system files
 .DS_Store
+
+# Ignore build artifacts
 /build
 /captures
 .externalNativeBuild
 .cxx
+
+# Ignore local properties file
 local.properties
+
+# Ignore Google services JSON file
+google-services.json
