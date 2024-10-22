@@ -6,7 +6,7 @@
 </p>
 
 <h2>Screenshots</h2>
-![App Screen](Screenshot/App_screen.png)
+![App Screen](Screenshot/App_Screen.png)
 
 
 
