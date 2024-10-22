@@ -46,13 +46,22 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
-    private val firestore: FirebaseFirestore = Firebase.firestore
+    private val firestore: FirebaseFirestore by lazy {
+        Firebase.firestore.apply {
+            // Enable offline persistence
+            val settings = FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
+                .build()
+            this.firestoreSettings = settings // Correct way to set the settings
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,10 +104,13 @@ fun ColorApp(firestore: FirebaseFirestore) {
                 TextButton(onClick = {
                     if (isValidHex(hexValue.text)) {
                         // Get the current timestamp
-                        val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("DD-MM-YYYY HH:mm:ss"))
+                        val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
                         val newColor = ColorItem(hexValue.text, timestamp, false)
                         colors = colors + newColor
                         hexValue = TextFieldValue()
+
+                        // Save to Firestore
+                        saveColorToFirestore(firestore, newColor)
                     }
                     showDialog = false
                 }) {
@@ -153,6 +165,8 @@ fun ColorApp(firestore: FirebaseFirestore) {
                                 .size(50.dp)
                                 .padding(4.dp)
                                 .clickable {
+                                    syncing = true
+                                    syncMessage = "Sync in progress..."
                                     syncColors(firestore, colors) { syncedCount, failedCount ->
                                         // Handle sync results
                                         if (syncedCount == 0) {
@@ -165,14 +179,10 @@ fun ColorApp(firestore: FirebaseFirestore) {
                                                     colorItem
                                                 }
                                             }
-                                            syncMessage =
-                                                "Successfully synced $syncedCount colors. Failed: $failedCount"
+                                            syncMessage = "Successfully synced $syncedCount colors. Failed: $failedCount"
                                         }
-                                        syncing = false
+                                        syncing = false // End syncing
                                     }
-                                    syncing = true
-                                    syncMessage = "Sync in progress..."
-
                                 }
                         )
                     }
@@ -232,7 +242,7 @@ fun HexValueDisplay(colorItem: ColorItem) {
             text = colorItem.hex.uppercase(),
             color = Color.White,
             fontSize = 18.sp,
-            fontWeight= FontWeight.Bold,
+            fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -289,6 +299,21 @@ fun fetchColors(firestore: FirebaseFirestore, onSuccess: (List<ColorItem>) -> Un
         }
 }
 
+// Save color to Firestore
+fun saveColorToFirestore(firestore: FirebaseFirestore, colorItem: ColorItem) {
+    firestore.collection("colors")
+        .add(hashMapOf(
+            "hex" to colorItem.hex,
+            "timestamp" to colorItem.timestamp
+        ))
+        .addOnSuccessListener {
+            Log.d("ColorApp", "Color added to Firestore: ${colorItem.hex}")
+        }
+        .addOnFailureListener { e ->
+            Log.w("ColorApp", "Error adding color to Firestore", e)
+        }
+}
+
 // Sync pending colors with Firestore and handle sync success/failure
 fun syncColors(
     firestore: FirebaseFirestore,
@@ -313,21 +338,16 @@ fun syncColors(
             .add(colorData)
             .addOnSuccessListener {
                 syncedCount++
+                Log.d("ColorApp", "Successfully synced color: ${color.hex}")
                 if (syncedCount + failedCount == unsyncedColors.size) {
-                    onSyncComplete(
-                        syncedCount,
-                        failedCount
-                    )
+                    onSyncComplete(syncedCount, failedCount)
                 }
             }
             .addOnFailureListener { e ->
-                Log.w("ColorApp", "Error adding color to Firestore", e)
+                Log.w("ColorApp", "Error syncing color: ${color.hex}", e)
                 failedCount++
                 if (syncedCount + failedCount == unsyncedColors.size) {
-                    onSyncComplete(
-                        syncedCount,
-                        failedCount
-                    )
+                    onSyncComplete(syncedCount, failedCount)
                 }
             }
     }
