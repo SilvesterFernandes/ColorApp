@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "350985775706",
+    "project_id": "shadesync-kt",
+    "storage_bucket": "shadesync-kt.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350985775706:android:dfd8ede6dafd69122fc663",
+        "android_client_info": {
+          "package_name": "com.example.colorapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuGgzLQa5pD7vXV9OQGk0uEMbv8zGDGQw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
