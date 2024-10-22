@@ -5,8 +5,7 @@
     <strong>ColorApp</strong> is an Android application built in Kotlin for storing and managing HEX color values, with support for syncing data across devices.
 </p>
 
-<h2>Screenshots</h2>
-![App Screen](file:///I:/Github/ColorApp/screenshots/App_Screen.png)
+
 
 <h2>Project Setup</h2>
 <ol>
